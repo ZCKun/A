@@ -1,0 +1,329 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>core.a &#8212; A  documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for core.a</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created by x2h1z on 2021/2/25.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
+
+
+<div class="viewcode-block" id="Market"><a class="viewcode-back" href="../../core.html#core.a.Market">[docs]</a><span class="k">class</span> <span class="nc">Market</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">SH</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">SZ</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="A"><a class="viewcode-back" href="../../core.html#core.a.A">[docs]</a><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; A Backtesting Framework</span>
+
+<span class="sd">    通常你只需要继承 :class:`A` 然后实现它的两个方法即可, Simple Example::</span>
+
+<span class="sd">        class Demo(A):</span>
+<span class="sd">            def __init__(self):</span>
+<span class="sd">                self.date = datetime.today()</span>
+<span class="sd">                # 设置回测所用到的数据所在路径</span>
+<span class="sd">                self.set_source_path(&quot;&lt;source/path&gt;&quot;)</span>
+<span class="sd">                # 设置买入时机和卖出时机</span>
+<span class="sd">                self.init(143000, 30 * 60, 93000, 30 * 60)</span>
+
+<span class="sd">            def on_day_stock(self, symbol_code: str, date: str, stock_df: pd.DataFrame) -&gt; bool:</span>
+<span class="sd">                # 因子计算等操作</span>
+<span class="sd">                pass</span>
+
+<span class="sd">            def on_day_result(self):</span>
+<span class="sd">                # 对回测结果的分析. 比如计算收益率</span>
+<span class="sd">                result = self.rate_of_return_calc(self.date, [&quot;000001&quot;])</span>
+
+<span class="sd">        if __name__ == &#39;__main__&#39;:</span>
+<span class="sd">            d = Demo()</span>
+<span class="sd">            # 启动回测</span>
+<span class="sd">            d.start()</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">COLUMNS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;BeginTime&quot;</span><span class="p">,</span> <span class="s2">&quot;EndTime&quot;</span><span class="p">,</span> <span class="s2">&quot;OpenPrice&quot;</span><span class="p">,</span> <span class="s2">&quot;HighPrice&quot;</span><span class="p">,</span> <span class="s2">&quot;LowPrice&quot;</span><span class="p">,</span> <span class="s2">&quot;ClosePrice&quot;</span><span class="p">,</span> <span class="s2">&quot;ThisVolume&quot;</span><span class="p">,</span> <span class="s2">&quot;ThisTurnover&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;PreClose&quot;</span><span class="p">,</span> <span class="s2">&quot;UpLimit&quot;</span><span class="p">,</span> <span class="s2">&quot;DropLimit&quot;</span><span class="p">,</span> <span class="s2">&quot;Volume&quot;</span><span class="p">,</span> <span class="s2">&quot;Turnover&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__buy_time</span> <span class="o">=</span> <span class="o">...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__b_T</span> <span class="o">=</span> <span class="o">...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sell_time</span> <span class="o">=</span> <span class="o">...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__s_T</span> <span class="o">=</span> <span class="o">...</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__top_limit</span> <span class="o">=</span> <span class="o">...</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__encoding</span> <span class="o">=</span> <span class="o">...</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__source_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__thread_workers</span> <span class="o">=</span> <span class="mi">50</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__top</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__symbol_filter</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+        <span class="n">symbol_code</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filepath</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__encoding</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">COLUMNS</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># self.condition(symbol_code, date, df)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_day_stock</span><span class="p">(</span><span class="n">symbol_code</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__top</span><span class="p">[</span><span class="n">symbol_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+
+<div class="viewcode-block" id="A.set_source_path"><a class="viewcode-back" href="../../core.html#core.a.A.set_source_path">[docs]</a>    <span class="k">def</span> <span class="nf">set_source_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;设置资源路径</span>
+
+<span class="sd">        :param source_path: 资源路径</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">source_path</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;source path </span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s2"> not exists.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__source_path</span> <span class="o">=</span> <span class="n">source_path</span></div>
+
+<div class="viewcode-block" id="A.init"><a class="viewcode-back" href="../../core.html#core.a.A.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buy_time</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">buy_time_end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sell_time</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sell_time_end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;初始化参数配置</span>
+
+<span class="sd">        :param buy_time: 买入时间</span>
+<span class="sd">        :param buy_time_end: 买入时长(秒)</span>
+<span class="sd">        :param sell_time: 卖出时间</span>
+<span class="sd">        :param sell_time_end: 卖出时长(秒)</span>
+<span class="sd">        :param encoding: 文件的编码格式. 作用于程序的所有读取和写入</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__buy_time</span> <span class="o">=</span> <span class="n">buy_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__b_T</span> <span class="o">=</span> <span class="n">buy_time_end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sell_time</span> <span class="o">=</span> <span class="n">sell_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__s_T</span> <span class="o">=</span> <span class="n">sell_time_end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__encoding</span> <span class="o">=</span> <span class="n">encoding</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_calc_average_price</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;计算均价&quot;&quot;&quot;</span>
+        <span class="n">turnover</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Turnover&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Turnover&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">volume</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Volume&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Volume&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">average_price</span> <span class="o">=</span> <span class="n">turnover</span> <span class="o">/</span> <span class="n">volume</span>
+        <span class="k">return</span> <span class="n">average_price</span>
+
+    <span class="k">def</span> <span class="nf">_rate_of_return_calc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;计算收益率&quot;&quot;&quot;</span>
+        <span class="c1"># 权重</span>
+        <span class="n">average_weight</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__top</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">symbol_code</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__top</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">buy_time_end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__buy_time</span><span class="p">),</span> <span class="s2">&quot;%H%M%S&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__b_T</span><span class="p">)</span>
+            <span class="n">buy_time_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">buy_time_end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H%M%S&quot;</span><span class="p">))</span>
+            <span class="n">b_interval_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;EndTime&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__buy_time</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;EndTime&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">buy_time_end</span><span class="p">)]</span>
+            <span class="n">buy_price</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_average_price</span><span class="p">(</span><span class="n">b_interval_df</span><span class="p">)</span>
+
+            <span class="n">next_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_next_day</span><span class="p">(</span><span class="n">date</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__source_path</span><span class="p">,</span> <span class="n">next_date</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">symbol_code</span><span class="si">}</span><span class="s2">*&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;找不到下一个交易日, 跳过. date:</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2">, next_date:</span><span class="si">{</span><span class="n">next_date</span><span class="si">}</span><span class="s2">, symbol_code:</span><span class="si">{</span><span class="n">symbol_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">s_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__encoding</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">COLUMNS</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">sell_time_end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sell_time</span><span class="p">),</span> <span class="s2">&quot;%H%M%S&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__s_T</span><span class="p">)</span>
+            <span class="n">sell_time_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sell_time_end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H%M%S&quot;</span><span class="p">))</span>
+            <span class="n">s_interval_df</span> <span class="o">=</span> <span class="n">s_df</span><span class="p">[</span>
+                <span class="p">(</span><span class="n">s_df</span><span class="p">[</span><span class="s1">&#39;EndTime&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sell_time</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">s_df</span><span class="p">[</span><span class="s1">&#39;EndTime&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">sell_time_end</span><span class="p">)]</span>
+            <span class="n">sell_price</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_average_price</span><span class="p">(</span><span class="n">s_interval_df</span><span class="p">)</span>
+
+            <span class="n">pnl</span> <span class="o">=</span> <span class="p">(</span><span class="n">sell_price</span> <span class="o">-</span> <span class="n">buy_price</span><span class="p">)</span> <span class="o">/</span> <span class="n">buy_price</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">average_weight</span> <span class="o">*</span> <span class="n">pnl</span>
+
+            <span class="n">rate</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="p">{</span>
+                <span class="s2">&quot;symbol&quot;</span><span class="p">:</span> <span class="n">symbol_code</span><span class="p">,</span>
+                <span class="s2">&quot;pnl&quot;</span><span class="p">:</span> <span class="n">pnl</span><span class="p">,</span>
+                <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="n">average_weight</span><span class="p">,</span>
+                <span class="c1"># 可能出现 -0.0</span>
+                <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">rate</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">rate</span>
+            <span class="p">}</span>
+
+<div class="viewcode-block" id="A.get_next_day"><a class="viewcode-back" href="../../core.html#core.a.A.get_next_day">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_next_day</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;获取下一个交易日</span>
+
+<span class="sd">        :param date: 日期</span>
+<span class="sd">        :return: 下一个交易日的datetime对象</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">dt</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># 过滤掉周末</span>
+            <span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">weekday</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">dt</span></div>
+
+<div class="viewcode-block" id="A.set_market"><a class="viewcode-back" href="../../core.html#core.a.A.set_market">[docs]</a>    <span class="k">def</span> <span class="nf">set_market</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">market</span><span class="p">:</span> <span class="n">Market</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;设置市场</span>
+
+<span class="sd">        :param market: 市场</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">market</span> <span class="o">==</span> <span class="n">Market</span><span class="o">.</span><span class="n">SZ</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__symbol_filter</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;000&#39;</span><span class="p">,</span> <span class="s1">&#39;002&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__symbol_filter</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="A.start"><a class="viewcode-back" href="../../core.html#core.a.A.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;启动回测</span>
+
+<span class="sd">        :param date: 回测日期. 默认目录下所有日期</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__source_path</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">date</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+            <span class="n">date_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">date_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">date_path</span> <span class="ow">in</span> <span class="n">date_paths</span><span class="p">:</span>
+            <span class="c1"># clean cache</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__top</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+            <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__thread_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">filepath</span> <span class="ow">in</span> <span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">date_path</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)):</span>
+                    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filepath</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="c1"># symbol_code = os.path.splitext(filename)[0]</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__symbol_filter</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">filename</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__symbol_filter</span> <span class="ow">or</span> <span class="n">filename</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__symbol_filter</span><span class="p">:</span>
+                            <span class="n">e</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_c</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_day_result</span><span class="p">()</span></div>
+
+            <span class="c1"># # wait for result</span>
+            <span class="c1"># symbol_codes = [str(i) for i in self.day_result()]</span>
+            <span class="c1"># self._top = {code: self._top[code] for code in symbol_codes}</span>
+
+            <span class="c1"># self._rate_of_return_calc(date)</span>
+
+<div class="viewcode-block" id="A.rate_of_return_calc"><a class="viewcode-back" href="../../core.html#core.a.A.rate_of_return_calc">[docs]</a>    <span class="k">def</span> <span class="nf">rate_of_return_calc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">symbol_codes</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;收益率计算</span>
+
+<span class="sd">        :param date: 日期</span>
+<span class="sd">        :param symbol_codes: 要计算的股票代码</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__top</span> <span class="o">=</span> <span class="p">{</span><span class="n">code</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__top</span><span class="p">[</span><span class="n">code</span><span class="p">]</span> <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">symbol_codes</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rate_of_return_calc</span><span class="p">(</span><span class="n">date</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="A.on_day_result"><a class="viewcode-back" href="../../core.html#core.a.A.on_day_result">[docs]</a>    <span class="k">def</span> <span class="nf">on_day_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;当遍历完一天的个股时会调用这个函数&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="A.on_day_stock"><a class="viewcode-back" href="../../core.html#core.a.A.on_day_stock">[docs]</a>    <span class="k">def</span> <span class="nf">on_day_stock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stock_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;some desc...</span>
+
+<span class="sd">        ``该方法会处于子线程运行``</span>
+
+<span class="sd">        :param symbol_code: 当前股票代码</span>
+<span class="sd">        :param date: 当前日期</span>
+<span class="sd">        :param stock_df: 数据 DataFrame对象</span>
+<span class="sd">        :return: 是否缓存当前 stock_df. 返回 true 会将当前 stock_df 缓存</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">A</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../backtesting.html">Backtest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backtesting.html#example">Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../core.html">core package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, 0x2h.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
