@@ -12,7 +12,10 @@ class Impl(A):
 
     def __init__(self):
         super().__init__()
-        self.set_source_path("/Users/x1h1z/Data/SZ")
+        # 设置数据路径
+        self.set_source_path("/Users/x2h1z/Data/SZ")
+        # 配置买入、卖出时间范围
+        # 这里设置的是143000 - 150000时间段买入. 第二天的93000 - 100000时间段卖出
         self.init(143000, 30 * 60, 93000, 30 * 60)
         self.factor_result = {}
         self.date = ...
@@ -22,8 +25,10 @@ class Impl(A):
         # 选取排名前五支股票
         a = dict(sorted(self.factor_result.items(), key=lambda x: x[1], reverse=True))
         symbol_codes = list(a.keys())
-        # calc 方法会返回一个 generator
-        for result in self.calc(self.date, symbol_codes):
+
+        # 计算收益率
+        # rate_of_return_calc 方法会返回一个 generator
+        for result in self.rate_of_return_calc(self.date, symbol_codes):
             symbol_code = result['symbol']
             pnl = result['pnl']
             rate = result['rate']

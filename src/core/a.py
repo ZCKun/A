@@ -17,8 +17,35 @@ class Market(Enum):
 
 
 class A:
-    NAMES = ["BeginTime", "EndTime", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "ThisVolume", "ThisTurnover",
-             "PreClose", "UpLimit", "DropLimit", "Volume", "Turnover"]
+    """ A Backtesting Framework
+
+    通常你只需要继承 :class:`A` 然后实现它的两个方法即可, Simple Example::
+
+        class Demo(A):
+            def __init__(self):
+                self.date = datetime.today()
+                # 设置回测所用到的数据所在路径
+                self.set_source_path("<source/path>")
+                # 设置买入时机和卖出时机
+                self.init(143000, 30 * 60, 93000, 30 * 60)
+
+            def on_day_stock(self, symbol_code: str, date: str, stock_df: pd.DataFrame) -> bool:
+                # 因子计算等操作
+                pass
+
+            def on_day_result(self):
+                # 对回测结果的分析. 比如计算收益率
+                result = self.rate_of_return_calc(self.date, ["000001"])
+
+        if __name__ == '__main__':
+            d = Demo()
+            # 启动回测
+            d.start()
+
+    """
+
+    COLUMNS = ["BeginTime", "EndTime", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "ThisVolume", "ThisTurnover",
+               "PreClose", "UpLimit", "DropLimit", "Volume", "Turnover"]
 
     def __init__(self):
         self.__buy_time = ...
@@ -39,26 +66,29 @@ class A:
 
     def _c(self, filepath, date):
         symbol_code = os.path.split(filepath)[1].split('.')[0]
-        df = pd.read_csv(filepath, encoding=self.__encoding, names=self.NAMES, index_col=False)
+        df = pd.read_csv(filepath, encoding=self.__encoding, names=self.COLUMNS, index_col=False)
         # self.condition(symbol_code, date, df)
         if self.on_day_stock(symbol_code, date, df):
             self.__top[symbol_code] = df
 
     def set_source_path(self, source_path: str):
+        """设置资源路径
+
+        :param source_path: 资源路径
+        """
         if not os.path.exists(source_path):
             print(f"source path {source_path} not exists.")
             return
         self.__source_path = source_path
 
     def init(self, buy_time: int, buy_time_end: int, sell_time: int, sell_time_end: int, encoding: str = "utf-8"):
-        """
-        初始化参数配置
+        """初始化参数配置
 
-        :param buy_time:买入时间
-        :param buy_time_end:买入结束时长(秒)
-        :param sell_time:卖出时间
-        :param sell_time_end:卖出结束时长(秒)
-        :param encoding:文件的编码格式. 作用于程序的所有读取和写入
+        :param buy_time: 买入时间
+        :param buy_time_end: 买入时长(秒)
+        :param sell_time: 卖出时间
+        :param sell_time_end: 卖出时长(秒)
+        :param encoding: 文件的编码格式. 作用于程序的所有读取和写入
         :return:
         """
         self.__buy_time = buy_time
@@ -92,7 +122,7 @@ class A:
                 print(f"找不到下一个交易日, 跳过. date:{date}, next_date:{next_date}, symbol_code:{symbol_code}")
                 continue
 
-            s_df = pd.read_csv(files[0], encoding=self.__encoding, names=self.NAMES, index_col=False)
+            s_df = pd.read_csv(files[0], encoding=self.__encoding, names=self.COLUMNS, index_col=False)
             sell_time_end = datetime.strptime(str(self.__sell_time), "%H%M%S") + timedelta(seconds=self.__s_T)
             sell_time_end = int(sell_time_end.strftime("%H%M%S"))
             s_interval_df = s_df[
@@ -113,8 +143,7 @@ class A:
 
     @staticmethod
     def get_next_day(date: Union[str, datetime]) -> datetime:
-        """
-        获取下一个交易日
+        """获取下一个交易日
 
         :param date: 日期
         :return: 下一个交易日的datetime对象
@@ -130,14 +159,17 @@ class A:
         return dt
 
     def set_market(self, market: Market):
+        """设置市场
+
+        :param market: 市场
+        """
         if market == Market.SZ:
             self.__symbol_filter = ['000', '002', '3']
         else:
             self.__symbol_filter = []
 
     def start(self, date: str = "*"):
-        """
-        启动回测
+        """启动回测
 
         :param date: 回测日期. 默认目录下所有日期
         :return:
@@ -168,7 +200,12 @@ class A:
 
             # self._rate_of_return_calc(date)
 
-    def calc(self, date: str, symbol_codes: Union[list, set, tuple]):
+    def rate_of_return_calc(self, date: str, symbol_codes: Union[list, set, tuple]):
+        """收益率计算
+
+        :param date: 日期
+        :param symbol_codes: 要计算的股票代码
+        """
         self.__top = {code: self.__top[code] for code in symbol_codes}
         return self._rate_of_return_calc(date)
 
@@ -177,9 +214,9 @@ class A:
         raise NotImplementedError
 
     def on_day_stock(self, symbol_code: str, date: str, stock_df: pd.DataFrame) -> bool:
-        """
-        some desc...
-        该回调会处于子线程
+        """some desc...
+
+        ``该方法会处于子线程运行``
 
         :param symbol_code: 当前股票代码
         :param date: 当前日期
