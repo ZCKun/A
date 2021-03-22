@@ -26,7 +26,7 @@ class A:
                 self.date = datetime.today()
                 # 设置回测所用到的数据所在路径
                 self.set_source_path("<source/path>")
-                # 设置买入时机和卖出时机
+                # 设置买入时段和卖出时段
                 self.init(143000, 30 * 60, 93000, 30 * 60)
 
             def on_day_stock(self, symbol_code: str, date: str, stock_df: pd.DataFrame) -> bool:
@@ -36,6 +36,7 @@ class A:
             def on_day_result(self):
                 # 对回测结果的分析. 比如计算收益率
                 result = self.rate_of_return_calc(self.date, ["000001"])
+
 
         if __name__ == '__main__':
             d = Demo()
