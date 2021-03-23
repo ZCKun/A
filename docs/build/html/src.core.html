@@ -14,6 +14,8 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.util package" href="src.util.html" />
+    <link rel="prev" title="src package" href="src.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -35,8 +37,165 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="src-core-a-module">
-<h2>src.core.a module<a class="headerlink" href="#src-core-a-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-core.a">
+<span id="src-core-a-module"></span><h2>src.core.a module<a class="headerlink" href="#module-core.a" title="Permalink to this headline">¶</a></h2>
+<p>Created by x2h1z on 2021/2/25.</p>
+<dl class="py class">
+<dt id="core.a.A">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">core.a.</span></code><code class="sig-name descname"><span class="pre">A</span></code><a class="reference internal" href="_modules/core/a.html#A"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.a.A" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A Backtesting Framework</p>
+<p>通常你只需要继承 <a class="reference internal" href="#core.a.A" title="core.a.A"><code class="xref py py-class docutils literal notranslate"><span class="pre">A</span></code></a> 然后实现它的两个方法即可, Simple Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Demo</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+        <span class="c1"># 设置回测所用到的数据所在路径</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_source_path</span><span class="p">(</span><span class="s2">&quot;&lt;source/path&gt;&quot;</span><span class="p">)</span>
+        <span class="c1"># 设置买入时段和卖出时段</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="mi">143000</span><span class="p">,</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">93000</span><span class="p">,</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">on_day_stock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stock_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="c1"># 因子计算等操作</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">on_day_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># 对回测结果的分析. 比如计算收益率</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_of_return_calc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;000001&quot;</span><span class="p">])</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">Demo</span><span class="p">()</span>
+    <span class="c1"># 启动回测</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt id="core.a.A.COLUMNS">
+<code class="sig-name descname"><span class="pre">COLUMNS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">['BeginTime',</span> <span class="pre">'EndTime',</span> <span class="pre">'OpenPrice',</span> <span class="pre">'HighPrice',</span> <span class="pre">'LowPrice',</span> <span class="pre">'ClosePrice',</span> <span class="pre">'ThisVolume',</span> <span class="pre">'ThisTurnover',</span> <span class="pre">'PreClose',</span> <span class="pre">'UpLimit',</span> <span class="pre">'DropLimit',</span> <span class="pre">'Volume',</span> <span class="pre">'Turnover']</span></em><a class="headerlink" href="#core.a.A.COLUMNS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="core.a.A.get_next_day">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_next_day</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">datetime.datetime</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">datetime.datetime</span><a class="reference internal" href="_modules/core/a.html#A.get_next_day"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.a.A.get_next_day" title="Permalink to this definition">¶</a></dt>
+<dd><p>获取下一个交易日</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>date</strong> – 日期</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>下一个交易日的datetime对象</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="core.a.A.init">
+<code class="sig-name descname"><span class="pre">init</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buy_time</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buy_time_end</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sell_time</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sell_time_end</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'utf-8'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/a.html#A.init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.a.A.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>初始化参数配置</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>buy_time</strong> – 买入时间</p></li>
+<li><p><strong>buy_time_end</strong> – 买入时长(秒)</p></li>
+<li><p><strong>sell_time</strong> – 卖出时间</p></li>
+<li><p><strong>sell_time_end</strong> – 卖出时长(秒)</p></li>
+<li><p><strong>encoding</strong> – 文件的编码格式. 作用于程序的所有读取和写入</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="core.a.A.market">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">market</span></code><a class="headerlink" href="#core.a.A.market" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="core.a.A.on_day_result">
+<code class="sig-name descname"><span class="pre">on_day_result</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/a.html#A.on_day_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.a.A.on_day_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>当遍历完一天的个股时会调用这个函数</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="core.a.A.on_day_stock">
+<code class="sig-name descname"><span class="pre">on_day_stock</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol_code</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stock_df</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="reference internal" href="_modules/core/a.html#A.on_day_stock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.a.A.on_day_stock" title="Permalink to this definition">¶</a></dt>
+<dd><p>some desc…</p>
+<p><code class="docutils literal notranslate"><span class="pre">该方法会处于子线程运行</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol_code</strong> – 当前股票代码</p></li>
+<li><p><strong>date</strong> – 当前日期</p></li>
+<li><p><strong>stock_df</strong> – 数据 DataFrame对象</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>是否缓存当前 stock_df. 返回 true 会将当前 stock_df 缓存</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="core.a.A.rate_of_return_calc">
+<code class="sig-name descname"><span class="pre">rate_of_return_calc</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_codes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span> </span><span class="pre">set</span><span class="p"><span class="pre">,</span> </span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/a.html#A.rate_of_return_calc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.a.A.rate_of_return_calc" title="Permalink to this definition">¶</a></dt>
+<dd><p>收益率计算</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>date</strong> – 日期</p></li>
+<li><p><strong>symbol_codes</strong> – 要计算的股票代码</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="core.a.A.set_source_path">
+<code class="sig-name descname"><span class="pre">set_source_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/a.html#A.set_source_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.a.A.set_source_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>设置资源路径</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>source_path</strong> – 资源路径</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="core.a.A.start">
+<code class="sig-name descname"><span class="pre">start</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'*'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/a.html#A.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.a.A.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>启动回测</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>date</strong> – 回测日期. 默认目录下所有日期</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="core.a.Market">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">core.a.</span></code><code class="sig-name descname"><span class="pre">Market</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/a.html#Market"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.a.Market" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="core.a.Market.SH">
+<code class="sig-name descname"><span class="pre">SH</span></code><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#core.a.Market.SH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="core.a.Market.SZ">
+<code class="sig-name descname"><span class="pre">SZ</span></code><em class="property"> <span class="pre">=</span> <span class="pre">1</span></em><a class="headerlink" href="#core.a.Market.SZ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-contents">
 <h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
@@ -61,16 +220,24 @@
 
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="backtesting.html">Backtest</a></li>
-<li class="toctree-l1"><a class="reference internal" href="backtesting.html#example">Example</a></li>
-<li class="toctree-l1"><a class="reference internal" href="core.html">core package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">src</a><ul>
+  <li><a href="src.html">src package</a><ul>
+      <li>Previous: <a href="src.html" title="previous chapter">src package</a></li>
+      <li>Next: <a href="src.util.html" title="next chapter">src.util package</a></li>
+  </ul></li>
+  </ul></li>
   </ul></li>
 </ul>
 </div>

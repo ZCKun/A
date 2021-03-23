@@ -11,9 +11,7 @@ Welcome to A's documentation!
    :caption: Contents:
 
    backtesting
-   core
-
-
+   modules
 
 
 Indices and tables

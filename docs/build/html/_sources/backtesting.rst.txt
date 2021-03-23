@@ -1,6 +1,6 @@
 Backtest
-----
-定义一个你自己的回测类，继承 :class:`~core.a.A` 类，实现 :func:`~core.a.A.on_day_result()` 和 on_day_stock 方法，然后调用 start 方法启动
+====
+定义一个你自己的回测类，继承 :class:`~core.a.A` 类，实现 :func:`~core.a.A.on_day_result()` 和 :func:`~core.a.A.on_day_stock()` 方法，然后调用 start 方法启动
 
 Example
 ----

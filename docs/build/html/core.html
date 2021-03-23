@@ -50,7 +50,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
         <span class="c1"># 设置回测所用到的数据所在路径</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_source_path</span><span class="p">(</span><span class="s2">&quot;&lt;source/path&gt;&quot;</span><span class="p">)</span>
-        <span class="c1"># 设置买入时机和卖出时机</span>
+        <span class="c1"># 设置买入时段和卖出时段</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="mi">143000</span><span class="p">,</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">93000</span><span class="p">,</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">on_day_stock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stock_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -60,6 +60,7 @@
     <span class="k">def</span> <span class="nf">on_day_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># 对回测结果的分析. 比如计算收益率</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_of_return_calc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;000001&quot;</span><span class="p">])</span>
+
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">Demo</span><span class="p">()</span>
@@ -107,6 +108,11 @@
 </dd></dl>
 
 <dl class="py method">
+<dt id="core.a.A.market">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">market</span></code><a class="headerlink" href="#core.a.A.market" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="core.a.A.on_day_result">
 <code class="sig-name descname"><span class="pre">on_day_result</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/a.html#A.on_day_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.a.A.on_day_result" title="Permalink to this definition">¶</a></dt>
 <dd><p>当遍历完一天的个股时会调用这个函数</p>
@@ -141,17 +147,6 @@
 <li><p><strong>date</strong> – 日期</p></li>
 <li><p><strong>symbol_codes</strong> – 要计算的股票代码</p></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="core.a.A.set_market">
-<code class="sig-name descname"><span class="pre">set_market</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">market</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#core.a.Market" title="core.a.Market"><span class="pre">core.a.Market</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/a.html#A.set_market"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.a.A.set_market" title="Permalink to this definition">¶</a></dt>
-<dd><p>设置市场</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>market</strong> – 市场</p>
 </dd>
 </dl>
 </dd></dl>

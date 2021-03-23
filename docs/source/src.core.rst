@@ -7,7 +7,7 @@ Submodules
 src.core.a module
 -----------------
 
-.. automodule:: src.core.a
+.. automodule:: core.a
    :members:
    :undoc-members:
    :show-inheritance:

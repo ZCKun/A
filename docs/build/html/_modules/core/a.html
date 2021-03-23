@@ -59,7 +59,7 @@
 <span class="sd">                self.date = datetime.today()</span>
 <span class="sd">                # 设置回测所用到的数据所在路径</span>
 <span class="sd">                self.set_source_path(&quot;&lt;source/path&gt;&quot;)</span>
-<span class="sd">                # 设置买入时机和卖出时机</span>
+<span class="sd">                # 设置买入时段和卖出时段</span>
 <span class="sd">                self.init(143000, 30 * 60, 93000, 30 * 60)</span>
 
 <span class="sd">            def on_day_stock(self, symbol_code: str, date: str, stock_df: pd.DataFrame) -&gt; bool:</span>
@@ -69,6 +69,7 @@
 <span class="sd">            def on_day_result(self):</span>
 <span class="sd">                # 对回测结果的分析. 比如计算收益率</span>
 <span class="sd">                result = self.rate_of_return_calc(self.date, [&quot;000001&quot;])</span>
+
 
 <span class="sd">        if __name__ == &#39;__main__&#39;:</span>
 <span class="sd">            d = Demo()</span>
@@ -95,6 +96,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__thread_workers</span> <span class="o">=</span> <span class="mi">50</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__top</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__market</span><span class="p">:</span> <span class="n">Market</span> <span class="o">=</span> <span class="o">...</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__symbol_filter</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="nf">_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
@@ -184,6 +186,8 @@
         <span class="k">global</span> <span class="n">dt</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">date</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
             <span class="c1"># 过滤掉周末</span>
@@ -191,15 +195,22 @@
                 <span class="k">break</span>
         <span class="k">return</span> <span class="n">dt</span></div>
 
-<div class="viewcode-block" id="A.set_market"><a class="viewcode-back" href="../../core.html#core.a.A.set_market">[docs]</a>    <span class="k">def</span> <span class="nf">set_market</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">market</span><span class="p">:</span> <span class="n">Market</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">market</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__market</span><span class="p">,</span> <span class="n">Market</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__market</span>
+
+    <span class="nd">@market</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">market</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">market</span><span class="p">:</span> <span class="n">Market</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;设置市场</span>
 
 <span class="sd">        :param market: 市场</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__market</span> <span class="o">=</span> <span class="n">market</span>
         <span class="k">if</span> <span class="n">market</span> <span class="o">==</span> <span class="n">Market</span><span class="o">.</span><span class="n">SZ</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__symbol_filter</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;000&#39;</span><span class="p">,</span> <span class="s1">&#39;002&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__symbol_filter</span> <span class="o">=</span> <span class="p">[]</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__symbol_filter</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="A.start"><a class="viewcode-back" href="../../core.html#core.a.A.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;启动回测</span>
