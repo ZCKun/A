@@ -152,6 +152,8 @@ class A:
         global dt
         if isinstance(date, str):
             dt = datetime.strptime(date, '%Y%m%d')
+        else:
+            dt = date
         while True:
             dt = dt + timedelta(days=1)
             # 过滤掉周末
