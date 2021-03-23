@@ -63,6 +63,7 @@ class A:
         self.__thread_workers = 50
 
         self.__top: dict = {}
+        self.__market: Market = ...
         self.__symbol_filter: list = []
 
     def _c(self, filepath, date):
@@ -161,11 +162,18 @@ class A:
                 break
         return dt
 
-    def set_market(self, market: Market):
+    @property
+    def market(self):
+        assert(isinstance(self.__market, Market))
+        return self.__market
+
+    @market.setter
+    def market(self, market: Market):
         """设置市场
 
         :param market: 市场
         """
+        self.__market = market
         if market == Market.SZ:
             self.__symbol_filter = ['000', '002', '3']
         else:
