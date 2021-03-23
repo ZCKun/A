@@ -6,6 +6,11 @@
 Welcome to A's documentation!
 =============================
 
+.. image:: https://img.shields.io/badge/python-3.8%7C3.9-blue
+   :target: https://python.org
+
+----
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

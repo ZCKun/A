@@ -37,6 +37,9 @@ class TestUtil(unittest.TestCase):
         self.assertEqual(get_all_stock("../exmaple/data", datetime.today()).__len__(), 4)
         self.assertEqual(get_all_stock("../exmaple/data", datetime.today() - timedelta(days=1)).__len__(), 2)
 
+    def test_get_trading_day(self):
+        self.assertEqual(get_trading_day("20210101", "20210201").__len__(), 20)
+
 
 if __name__ == '__main__':
     unittest.main()

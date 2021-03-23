@@ -2,7 +2,7 @@ import os
 import re
 
 from .holiday import get_holiday
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Union, Optional
 
 
@@ -86,8 +86,12 @@ def get_all_stock(root_path: str, date: Optional[datetime] = None) -> list:
 def get_trading_day(start: Union[datetime, str], end: Optional[Union[str, datetime]] = None) -> list:
     """获取指定时间范围内的所有交易日,排除节假日和周末
 
-    :param start: 开始时间. str 或 datetime 类型; ``需要注意的是 str 必须要是 YYYYMMDD 格式``
-    :param end: 结束时间. 可选; str 或 datetime 类型; ``需要注意的是 str 必须要是 YYYYMMDD 格式``
+    :param start: 开始时间
+                str 或 datetime 类型
+                ``需要注意的是 str 必须要是 YYYYMMDD 格式``
+    :param end: 结束时间, 可选, 不包含
+                str 或 datetime 类型
+                ``需要注意的是 str 必须要是 YYYYMMDD 格式``
     :return: 所有交易日
     """
     start_dt = start
@@ -106,12 +110,10 @@ def get_trading_day(start: Union[datetime, str], end: Optional[Union[str, dateti
 
     holidays = get_holiday(start_dt, end_dt)
 
-    while start_dt <= end_dt:
+    while start_dt < end_dt:
         # 排除周末和节假日
-        if start_dt.weekday() > 4 or start_dt.strftime("%Y%m%d") in holidays:
-            continue
-
-        trading_day.append(start_dt)
+        if start_dt.weekday() < 5 and start_dt.strftime("%Y%m%d") not in holidays:
+            trading_day.append(start_dt)
         start_dt += timedelta(days=1)
 
     return trading_day
