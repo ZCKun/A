@@ -1,5 +1,7 @@
 import unittest
+
 from src.util import *
+from datetime import timedelta
 
 
 class TestUtil(unittest.TestCase):
@@ -23,10 +25,17 @@ class TestUtil(unittest.TestCase):
     def test_is_symbol_code(self):
         self.assertEqual(is_symbol_code("000001"), True)
         self.assertEqual(is_symbol_code("00000"), False)
+        self.assertEqual(is_symbol_code("ABCDEF"), False)
 
     def test_traverse_path(self):
         self.assertEqual(traverse_path(".").__len__(), 2)
         self.assertEqual(traverse_path("../src").__len__(), 7)
+        self.assertEqual(traverse_path("../exmaple/data").__len__(), 6)
+
+    def test_get_all_stock(self):
+        self.assertEqual(get_all_stock("../exmaple/data").__len__(), 6)
+        self.assertEqual(get_all_stock("../exmaple/data", datetime.today()).__len__(), 4)
+        self.assertEqual(get_all_stock("../exmaple/data", datetime.today() - timedelta(days=1)).__len__(), 2)
 
 
 if __name__ == '__main__':

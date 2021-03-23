@@ -1,4 +1,5 @@
 import os
+import re
 
 from datetime import datetime
 from typing import Union, Optional
@@ -25,7 +26,8 @@ def is_symbol_code(code: str) -> bool:
     :param code: 代码
     :return:
     """
-    return len(code.split('.')[-1]) == 6
+    r = re.findall(r"(\d{6})", code)
+    return len(code) <= 9 and len(r) > 0
 
 
 def is_sz_symbol_code(code: str) -> bool:
@@ -58,18 +60,23 @@ def get_all_stock(root_path: str, date: Optional[datetime] = None) -> list:
     """获取数据路径下的所有股票代码
 
     :param root_path: 数据路径
-    :param date: 日期. 可选, 默认所有日期
+    :param date: 日期. 可选,默认全部
     :return: 去重后的所有股票代码
     """
-    stocks = []
-
     if date:
         date_s = date.strftime('%Y%m%d')
-        path = os.path.join(root_path, date_s[:4], date_s[4:6], date_s)
+        path = os.path.join(root_path, date_s[:4], date_s[:6], date_s)
     else:
-        path = os.path.join(root_path, )
+        path = root_path
 
     if not os.path.exists(path):
-        raise FileNotFoundError(f"Date {date} Data does not exist on this day.")
+        raise FileNotFoundError(f"{path} not exists.")
+
+    stocks = []
+    for i in traverse_path(path):
+        s = os.path.splitext(os.path.split(i)[-1])[0]
+        # 检查一下是不是 A 股股票代码
+        if is_sz_symbol_code(s) or is_sh_symbol_code(s):
+            stocks.append(s)
 
     return stocks
