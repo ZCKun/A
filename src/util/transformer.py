@@ -6,11 +6,12 @@ from typing import List
 def vwap_calc(df: pd.DataFrame, period: List[int]) -> float:
     """计算给定时段的成交量加权平均价
 
-    df 格式: open high low close volume
+    Args:
+        df: 格式: open high low close volume
+        period: 时段
 
-    :param df:
-    :param period: 时段
-    :return: vwap
+    Returns: vwap
+
     """
     start = period[0]
     end = period[1]

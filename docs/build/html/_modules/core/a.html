@@ -44,12 +44,12 @@
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
 
 
-<div class="viewcode-block" id="Market"><a class="viewcode-back" href="../../core.html#core.a.Market">[docs]</a><span class="k">class</span> <span class="nc">Market</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<div class="viewcode-block" id="Market"><a class="viewcode-back" href="../../src.core.html#core.a.Market">[docs]</a><span class="k">class</span> <span class="nc">Market</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">SH</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">SZ</span> <span class="o">=</span> <span class="mi">1</span></div>
 
 
-<div class="viewcode-block" id="A"><a class="viewcode-back" href="../../core.html#core.a.A">[docs]</a><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+<div class="viewcode-block" id="A"><a class="viewcode-back" href="../../src.core.html#core.a.A">[docs]</a><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot; A Backtesting Framework</span>
 
 <span class="sd">    通常你只需要继承 :class:`A` 然后实现它的两个方法即可, Simple Example::</span>
@@ -106,25 +106,32 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_day_stock</span><span class="p">(</span><span class="n">symbol_code</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__top</span><span class="p">[</span><span class="n">symbol_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
 
-<div class="viewcode-block" id="A.set_source_path"><a class="viewcode-back" href="../../core.html#core.a.A.set_source_path">[docs]</a>    <span class="k">def</span> <span class="nf">set_source_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="A.set_source_path"><a class="viewcode-back" href="../../src.core.html#core.a.A.set_source_path">[docs]</a>    <span class="k">def</span> <span class="nf">set_source_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;设置资源路径</span>
 
-<span class="sd">        :param source_path: 资源路径</span>
+<span class="sd">        Args:</span>
+<span class="sd">            source_path: 资源路径</span>
+
+<span class="sd">        Returns:</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">source_path</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;source path </span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s2"> not exists.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__source_path</span> <span class="o">=</span> <span class="n">source_path</span></div>
 
-<div class="viewcode-block" id="A.init"><a class="viewcode-back" href="../../core.html#core.a.A.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buy_time</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">buy_time_end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sell_time</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sell_time_end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="A.init"><a class="viewcode-back" href="../../src.core.html#core.a.A.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buy_time</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">buy_time_end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sell_time</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sell_time_end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;初始化参数配置</span>
 
-<span class="sd">        :param buy_time: 买入时间</span>
-<span class="sd">        :param buy_time_end: 买入时长(秒)</span>
-<span class="sd">        :param sell_time: 卖出时间</span>
-<span class="sd">        :param sell_time_end: 卖出时长(秒)</span>
-<span class="sd">        :param encoding: 文件的编码格式. 作用于程序的所有读取和写入</span>
-<span class="sd">        :return:</span>
+<span class="sd">        Args:</span>
+<span class="sd">            buy_time: 买入时间</span>
+<span class="sd">            buy_time_end: 买入时长(秒)</span>
+<span class="sd">            sell_time: 卖出时间</span>
+<span class="sd">            sell_time_end: 卖出时长(秒)</span>
+<span class="sd">            encoding: 文件的编码格式. 作用于程序的所有读取和写入</span>
+
+<span class="sd">        Returns: None</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__buy_time</span> <span class="o">=</span> <span class="n">buy_time</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__b_T</span> <span class="o">=</span> <span class="n">buy_time_end</span>
@@ -176,12 +183,15 @@
                 <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">rate</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">rate</span>
             <span class="p">}</span>
 
-<div class="viewcode-block" id="A.get_next_day"><a class="viewcode-back" href="../../core.html#core.a.A.get_next_day">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="A.get_next_day"><a class="viewcode-back" href="../../src.core.html#core.a.A.get_next_day">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_next_day</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;获取下一个交易日</span>
 
-<span class="sd">        :param date: 日期</span>
-<span class="sd">        :return: 下一个交易日的datetime对象</span>
+<span class="sd">        Args:</span>
+<span class="sd">            date: 日期</span>
+
+<span class="sd">        Returns: 下一个交易日的datetime对象</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">global</span> <span class="n">dt</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -204,7 +214,11 @@
     <span class="k">def</span> <span class="nf">market</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">market</span><span class="p">:</span> <span class="n">Market</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;设置市场</span>
 
-<span class="sd">        :param market: 市场</span>
+<span class="sd">        Args:</span>
+<span class="sd">            market: 市场</span>
+
+<span class="sd">        Returns:</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__market</span> <span class="o">=</span> <span class="n">market</span>
         <span class="k">if</span> <span class="n">market</span> <span class="o">==</span> <span class="n">Market</span><span class="o">.</span><span class="n">SZ</span><span class="p">:</span>
@@ -212,11 +226,14 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__symbol_filter</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="A.start"><a class="viewcode-back" href="../../core.html#core.a.A.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="A.start"><a class="viewcode-back" href="../../src.core.html#core.a.A.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;启动回测</span>
 
-<span class="sd">        :param date: 回测日期. 默认目录下所有日期</span>
-<span class="sd">        :return:</span>
+<span class="sd">        Args:</span>
+<span class="sd">            date: 回测日期. 默认目录下所有日期</span>
+
+<span class="sd">        Returns:</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__source_path</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">date</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
@@ -244,28 +261,45 @@
 
             <span class="c1"># self._rate_of_return_calc(date)</span>
 
-<div class="viewcode-block" id="A.rate_of_return_calc"><a class="viewcode-back" href="../../core.html#core.a.A.rate_of_return_calc">[docs]</a>    <span class="k">def</span> <span class="nf">rate_of_return_calc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">symbol_codes</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]):</span>
+<div class="viewcode-block" id="A.rate_of_return_calc"><a class="viewcode-back" href="../../src.core.html#core.a.A.rate_of_return_calc">[docs]</a>    <span class="k">def</span> <span class="nf">rate_of_return_calc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">symbol_codes</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]):</span>
         <span class="sd">&quot;&quot;&quot;收益率计算</span>
 
-<span class="sd">        :param date: 日期</span>
-<span class="sd">        :param symbol_codes: 要计算的股票代码</span>
+<span class="sd">        Args:</span>
+<span class="sd">            date: 日期</span>
+<span class="sd">            symbol_codes: 要计算的股票代码</span>
+
+<span class="sd">        Returns:</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__top</span> <span class="o">=</span> <span class="p">{</span><span class="n">code</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__top</span><span class="p">[</span><span class="n">code</span><span class="p">]</span> <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">symbol_codes</span><span class="p">}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rate_of_return_calc</span><span class="p">(</span><span class="n">date</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="A.on_day_result"><a class="viewcode-back" href="../../core.html#core.a.A.on_day_result">[docs]</a>    <span class="k">def</span> <span class="nf">on_day_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;当遍历完一天的个股时会调用这个函数&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="A.on_day_result"><a class="viewcode-back" href="../../src.core.html#core.a.A.on_day_result">[docs]</a>    <span class="k">def</span> <span class="nf">on_day_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;当遍历完一天的个股时会调用这个函数</span>
+<span class="sd">        ``子类必须实现``</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        Raises: NotImplementedError</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="A.on_day_stock"><a class="viewcode-back" href="../../core.html#core.a.A.on_day_stock">[docs]</a>    <span class="k">def</span> <span class="nf">on_day_stock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stock_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;some desc...</span>
+<div class="viewcode-block" id="A.on_day_stock"><a class="viewcode-back" href="../../src.core.html#core.a.A.on_day_stock">[docs]</a>    <span class="k">def</span> <span class="nf">on_day_stock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stock_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;当遍历完个股一天行情时会调用这个函数</span>
+<span class="sd">        ``子类必须实现``</span>
+<span class="sd">        ``该方法会运行在子线程``</span>
 
-<span class="sd">        ``该方法会处于子线程运行``</span>
+<span class="sd">        Args:</span>
+<span class="sd">            symbol_code: 股票代码</span>
+<span class="sd">            date: 日期</span>
+<span class="sd">            stock_df: 行情数据</span>
 
-<span class="sd">        :param symbol_code: 当前股票代码</span>
-<span class="sd">        :param date: 当前日期</span>
-<span class="sd">        :param stock_df: 数据 DataFrame对象</span>
-<span class="sd">        :return: 是否缓存当前 stock_df. 返回 true 会将当前 stock_df 缓存</span>
+<span class="sd">        Returns: 是否缓存当前 stock_df. 返回 true 会将当前 stock_df 缓存</span>
+<span class="sd">            ``该缓存的数据会在计算收益率中使用, 无特殊需求, 返回True即可``</span>
+
+<span class="sd">        Raises: NotImplementedError</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
 </pre></div>
@@ -289,8 +323,7 @@
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../backtesting.html">Backtest</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../backtesting.html#example">Example</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../core.html">core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
 </ul>
 
 <div class="relations">

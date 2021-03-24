@@ -76,22 +76,29 @@ class A:
     def set_source_path(self, source_path: str):
         """设置资源路径
 
-        :param source_path: 资源路径
+        Args:
+            source_path: 资源路径
+
+        Returns:
+
         """
         if not os.path.exists(source_path):
             print(f"source path {source_path} not exists.")
             return
         self.__source_path = source_path
 
-    def init(self, buy_time: int, buy_time_end: int, sell_time: int, sell_time_end: int, encoding: str = "utf-8"):
+    def init(self, buy_time: int, buy_time_end: int, sell_time: int, sell_time_end: int, encoding: str = "utf-8") -> None:
         """初始化参数配置
 
-        :param buy_time: 买入时间
-        :param buy_time_end: 买入时长(秒)
-        :param sell_time: 卖出时间
-        :param sell_time_end: 卖出时长(秒)
-        :param encoding: 文件的编码格式. 作用于程序的所有读取和写入
-        :return:
+        Args:
+            buy_time: 买入时间
+            buy_time_end: 买入时长(秒)
+            sell_time: 卖出时间
+            sell_time_end: 卖出时长(秒)
+            encoding: 文件的编码格式. 作用于程序的所有读取和写入
+
+        Returns: None
+
         """
         self.__buy_time = buy_time
         self.__b_T = buy_time_end
@@ -147,8 +154,11 @@ class A:
     def get_next_day(date: Union[str, datetime]) -> datetime:
         """获取下一个交易日
 
-        :param date: 日期
-        :return: 下一个交易日的datetime对象
+        Args:
+            date: 日期
+
+        Returns: 下一个交易日的datetime对象
+
         """
         global dt
         if isinstance(date, str):
@@ -171,7 +181,11 @@ class A:
     def market(self, market: Market):
         """设置市场
 
-        :param market: 市场
+        Args:
+            market: 市场
+
+        Returns:
+
         """
         self.__market = market
         if market == Market.SZ:
@@ -182,8 +196,11 @@ class A:
     def start(self, date: str = "*"):
         """启动回测
 
-        :param date: 回测日期. 默认目录下所有日期
-        :return:
+        Args:
+            date: 回测日期. 默认目录下所有日期
+
+        Returns:
+
         """
         path = os.path.join(self.__source_path, date)
         if date == '*':
@@ -214,24 +231,41 @@ class A:
     def rate_of_return_calc(self, date: str, symbol_codes: Union[list, set, tuple]):
         """收益率计算
 
-        :param date: 日期
-        :param symbol_codes: 要计算的股票代码
+        Args:
+            date: 日期
+            symbol_codes: 要计算的股票代码
+
+        Returns:
+
         """
         self.__top = {code: self.__top[code] for code in symbol_codes}
         return self._rate_of_return_calc(date)
 
     def on_day_result(self):
-        """当遍历完一天的个股时会调用这个函数"""
+        """当遍历完一天的个股时会调用这个函数
+        ``子类必须实现``
+
+        Returns:
+
+        Raises: NotImplementedError
+
+        """
         raise NotImplementedError
 
     def on_day_stock(self, symbol_code: str, date: str, stock_df: pd.DataFrame) -> bool:
-        """some desc...
+        """当遍历完个股一天行情时会调用这个函数
+        ``子类必须实现``
+        ``该方法会运行在子线程``
 
-        ``该方法会处于子线程运行``
+        Args:
+            symbol_code: 股票代码
+            date: 日期
+            stock_df: 行情数据
 
-        :param symbol_code: 当前股票代码
-        :param date: 当前日期
-        :param stock_df: 数据 DataFrame对象
-        :return: 是否缓存当前 stock_df. 返回 true 会将当前 stock_df 缓存
+        Returns: 是否缓存当前 stock_df. 返回 true 会将当前 stock_df 缓存
+            ``该缓存的数据会在计算收益率中使用, 无特殊需求, 返回True即可``
+
+        Raises: NotImplementedError
+
         """
         raise NotImplementedError
